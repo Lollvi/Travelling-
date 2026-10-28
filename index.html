@@ -117,7 +117,7 @@ button.nav svg{width:16px;height:16px}
 .badge{flex:none;height:22px;min-width:22px;padding:0 6px;border-radius:11px;font-size:12px;font-weight:800;color:#fff;
   display:grid;place-items:center;margin-top:1px;letter-spacing:.3px}
 .badge.round{width:22px;padding:0}
-.l2{background:#004b87} .l4{background:#008e9c} .l5{background:#a6217f} .l8{background:#009b6b} .l14{background:#d5a7a1;color:#5a2c25}
+.l2{background:#004b87} .l4{background:#008e9c} .l5{background:#a6217f} .l7{background:#f6b13a;color:#3a2700} .l8{background:#009b6b} .l14{background:#d5a7a1;color:#5a2c25}
 .walk{background:var(--faint)} .exit{background:var(--gold);color:#3a2700}
 .step .txt{min-width:0;line-height:1.5}
 .step .txt b{font-weight:650}
@@ -170,10 +170,10 @@ button.nav svg{width:16px;height:16px}
         <div class="lbl">距回程发车</div>
         <div class="count" id="count">--</div>
       </div>
-      <label class="dep"><span class="lbl">回天津车次</span><input type="time" id="dep" value="19:30"></label>
+      <label class="dep"><span class="lbl">回天津车次</span><input type="time" id="dep" value="20:35"></label>
     </div>
     <div class="progress" id="progress"><i></i></div>
-    <div class="ends"><span>09:30 北京南</span><span id="endLbl">19:30 发车</span></div>
+    <div class="ends"><span>09:30 北京南</span><span id="endLbl">20:35 发车</span></div>
   </header>
 
   <div class="nowbar">
@@ -252,22 +252,35 @@ const TRIP = {
       {line:"走", cls:"walk", text:"沿 <b>龙潭路</b> 往东约 800 米到龙潭公园西北门"} ],
       nav:{ to:"longtan", mode:1 } },
 
-    { type:"stop", start:"16:40", endFromDep:115, name:"龙潭公园", tag:"赏秋 · 看日落", kind:"park", icon:"🌅", place:"longtan",
-      desc:"湖面大、视野开阔。北京这几天<b>约 17:15 日落</b>，可以在湖边等夕阳。",
-      tips:["结束时间按你的车次自动算"] },
+    { type:"stop", start:"16:40", end:"17:40", name:"龙潭公园", tag:"赏秋 · 看日落", kind:"park", icon:"🌅", place:"longtan",
+      desc:"湖面大、视野开阔。北京这几天<b>约 17:15 日落</b>，可以在湖边等夕阳，天黑前出园。" },
 
     { type:"leg", dur:"约 35 分钟 · 换乘 1 次", steps:[
-      {line:"5", text:"天坛东门往 <b>宋家庄</b> 方向，坐 <b>1 站</b> 到 <b>蒲黄榆</b>"},
-      {line:"换", cls:"walk", text:"站内扶梯换乘 14 号线"},
-      {line:"14", text:"往 <b>张郭庄</b> 方向，经景泰、永定门外，到 <b>北京南站</b>"} ],
-      opt:"累了也可以从公园门口打车，约 20 分钟。",
+      {line:"走", cls:"walk", text:"沿龙潭路往西走回 <b>天坛东门站</b>，约 12 分钟"},
+      {line:"5", text:"往 <b>天通苑北</b> 方向，坐 <b>1 站</b> 到 <b>磁器口</b>"},
+      {line:"换", cls:"walk", text:"站内换乘 7 号线"},
+      {line:"7", text:"往 <b>北京西站</b> 方向，坐 <b>2 站</b> 到 <b>珠市口</b>（中间是桥湾）"},
+      {line:"出", cls:"exit", text:"<b>E 口或 F 口（前门大街）</b>，沿前门步行街往北走约 10 分钟，右手边就是鲜鱼口"} ],
+      opt:"不想换乘：从公园门口打车到前门，约 15 分钟。",
+      nav:{ to:"xianyukou", mode:1 } },
+
+    { type:"food", start:"18:15", endFromDep:60, name:"晚饭 · 鲜鱼口小吃街", tag:"前门 · 老字号小吃", kind:"meal", icon:"🥟",
+      desc:"晚饭不大吃，挑几样尝尝就好。前门大街晚上亮灯，边逛边吃。",
+      tips:["营业时间没查到准信，店家通常营业到晚上，到了以现场为准","离开时间按你的车次自动算，看卡片左边"],
+      shops:[
+        { id:"tianxingju", name:"天兴居", note:"炒肝、包子", kw:"天兴居 鲜鱼口" },
+        { id:"jinfang", name:"锦芳小吃", note:"元宵、面茶、奶油炸糕", kw:"锦芳小吃 鲜鱼口" },
+        { id:"duyichu", name:"都一处", note:"烧麦（前门大街上）", kw:"都一处烧麦 前门" } ] },
+
+    { type:"leg", dur:"约 30 分钟 · 换乘 1 次", steps:[
+      {line:"走", cls:"walk", text:"往北走到 <b>前门站</b>，进 8 号线"},
+      {line:"8", text:"往 <b>瀛海</b> 方向，坐 <b>3 站</b> 到 <b>永定门外</b>（珠市口、天桥）"},
+      {line:"换", cls:"walk", text:"站内通道换乘 14 号线"},
+      {line:"14", text:"往 <b>张郭庄</b> 方向，坐到 <b>北京南站</b>（早上来的那条线反方向）"} ],
+      opt:"时间紧就从前门大街打车，约 15 分钟。",
       nav:{ to:"nanzhan", mode:1 } },
 
-    { type:"stop", startFromDep:75, endFromDep:30, name:"晚饭", tag:"北京南站", kind:"meal", icon:"🥢", place:"nanzhan",
-      desc:"在车站里或周边吃，不用担心赶不上车。",
-      search:{ kw:"北京南站 美食", label:"搜南站美食" } },
-
-    { type:"stop", startFromDep:30, name:"进站 · 回天津", tag:"返程", kind:"go", icon:"🎫",
+    { type:"stop", startFromDep:30, name:"进站 · 回天津", tag:"返程", kind:"go", icon:"🎫", place:"nanzhan",
       desc:"发车前 30 分钟到检票口。北京南站进站安检排队可能要十几分钟。" }
   ]
 };
@@ -277,6 +290,7 @@ const PLACES = {
   beiluogu: { name:"北锣鼓巷", lat:39.9434, lon:116.3966 },
   tanghulu: { name:"雍和宫大街185号", kw:"雍和宫大街185号" },
   longtan:  { name:"龙潭公园", lat:39.8791, lon:116.4275 },
+  xianyukou:{ name:"鲜鱼口美食街", kw:"鲜鱼口美食街" },
   nanzhan:  { name:"北京南站", lat:39.8650, lon:116.3786 }
 };
 
@@ -323,7 +337,7 @@ function searchAmap(kw){
 }
 
 // ===== 时间计算 =====
-function depMin(){ return toMin($("#dep").value || "19:30"); }
+function depMin(){ return toMin($("#dep").value || "20:35"); }
 function times(it){
   const d = depMin();
   const s = it.start ? toMin(it.start) : it.startFromDep!=null ? d - it.startFromDep : null;
@@ -359,7 +373,7 @@ function render(){
           <span class="info"><b>${sh.name}</b><span>${sh.note}</span></span>
           <button data-kw="${sh.kw}">高德搜</button>
         </label>`).join("")}</div>
-        <div class="tally" id="tally">已打卡 ${n} / ${it.shops.length}</div>`;
+        <div class="tally">已打卡 ${n} / ${it.shops.length}</div>`;
     }
     const btns = [];
     if (it.place) btns.push(`<button class="nav" data-nav="${it.place}" data-mode="1">${ICON_NAV}导航到这里</button>`);
@@ -430,9 +444,9 @@ function tick(){
     $("#count").textContent = h >= 24 ? `${Math.floor(h/24)} 天 ${h%24} 小时` : `${h} 小时 ${m} 分`;
   } else $("#count").textContent = "已发车";
 
-  const leaveLT = d - 115;
-  $("#warn").textContent = `⏰ 最晚 ${fmt(leaveLT)} 离开龙潭公园` +
-    (leaveLT < toMin("17:10") ? "（车次较早，可缩短龙潭或直接在南站吃晚饭）" : "");
+  const leave = d - 60;
+  $("#warn").textContent = `⏰ 最晚 ${fmt(leave)} 离开鲜鱼口去南站` +
+    (leave < toMin("18:45") ? "（车次较早，晚饭时间不够，可直接在南站吃）" : "");
 }
 
 // ===== 事件 =====
@@ -462,10 +476,10 @@ document.addEventListener("change", e => {
   got[e.target.dataset.shop] = e.target.checked;
   store.set("shops", got);
   e.target.closest(".shop").classList.toggle("got", e.target.checked);
-  const all = document.querySelectorAll("[data-shop]");
-  $("#tally").textContent = `已打卡 ${[...all].filter(x=>x.checked).length} / ${all.length}`;
+  const card = e.target.closest(".card"), all = [...card.querySelectorAll("[data-shop]")];
+  card.querySelector(".tally").textContent = `已打卡 ${all.filter(x=>x.checked).length} / ${all.length}`;
 });
-$("#dep").value = store.get("dep", "19:30");
+$("#dep").value = store.get("dep", "20:35");
 $("#dep").addEventListener("change", () => { store.set("dep", $("#dep").value); render(); });
 render();
 setInterval(tick, 30000);
