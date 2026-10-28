@@ -136,7 +136,17 @@ button.nav svg{width:16px;height:16px}
 .shop .info b{font-size:15px;font-weight:600}
 .shop .info span{display:block;font-size:12.5px;color:var(--sub)}
 .shop.got .info b{text-decoration:line-through;text-decoration-color:var(--faint);color:var(--sub)}
-.shop button{flex:none;font:inherit;font-size:13px;font-weight:600;border:0;border-radius:10px;padding:7px 10px;background:var(--accent-soft);color:var(--accent)}
+.shop{align-items:flex-start}
+.shop .box{margin-top:1px}
+.acts{display:flex !important;gap:6px;margin-top:8px}
+button.deal{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:9px;padding:5px 11px;min-height:30px}
+button.deal:active{transform:scale(.95)}
+button.deal.amap{background:var(--accent-soft);color:var(--accent)}
+button.deal.mt{background:#ffd100;color:#3b2e00}
+button.deal.dp{background:#ff6633;color:#fff}
+.dealrow{display:inline-flex;align-items:center;gap:6px}
+.dealrow .small{font-size:12.5px;color:var(--sub);margin-right:2px}
+.dealrow button.deal{min-height:40px;padding:0 14px;font-size:14px;border-radius:12px}
 .tally{font-size:12px;color:var(--sub);margin-top:10px;text-align:right}
 
 .foot{margin:28px 4px 0;padding:16px;border-radius:16px;border:1px dashed var(--line);font-size:12.5px;color:var(--sub);list-style:none}
@@ -234,7 +244,8 @@ const TRIP = {
       nav:{ to:"tanghulu", mode:2 } },
 
     { type:"stop", start:"14:25", end:"14:40", name:"雍和宫 · 冰糖葫芦", tag:"小吃", kind:"snack", icon:"🍡", place:"tanghulu",
-      desc:"<b>雍和宫大街 185 号，烤肉宛隔壁</b>。买完沿雍和宫大街一路往南走。" },
+      desc:"<b>雍和宫大街 185 号，烤肉宛隔壁</b>。买完沿雍和宫大街一路往南走。",
+      deal:"冰糖葫芦 雍和宫大街" },
 
     { type:"leg", dur:"步行约 30 分钟 · 边走边吃", steps:[
       {line:"走", cls:"walk", text:"沿 <b>雍和宫大街 → 北新桥 → 东四北大街</b> 往南，一直走到 <b>东四路口</b>"} ] },
@@ -307,8 +318,8 @@ const ICON_NAV = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4.
 const ICON_SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
 const ICON_CHECK = `<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-// 唤起高德 App；1.6 秒后页面仍在前台说明没装 App，退回高德网页版
-function openAmap(appUrl, webUrl){
+// 唤起 App；1.6 秒后页面仍在前台说明没装 App，退回网页版
+function openApp(appUrl, webUrl, appName){
   let left = false;
   const onHide = () => { left = true; };
   document.addEventListener("visibilitychange", onHide, { once:true });
@@ -317,10 +328,21 @@ function openAmap(appUrl, webUrl){
     document.removeEventListener("visibilitychange", onHide);
     if (!left && document.visibilityState === "visible") {
       if (navigator.onLine) window.location.href = webUrl;
-      else toast("没有检测到高德地图 App，且当前离线");
+      else toast(`没有检测到${appName} App，且当前离线`);
     }
   }, 1600);
 }
+const openAmap = (app, web) => openApp(app, web, "高德地图");
+
+// 团购：在美团 / 大众点评里按店名搜索，店铺页里看有没有团购套餐
+// 两个 App 都没装时退回大众点评网页版（城市 2 = 北京）
+function openDeal(app, kw){
+  const k = encodeURIComponent(kw);
+  const web = `https://m.dianping.com/search/keyword/2/0_${k}`;
+  if (app === "mt") openApp(`imeituan://www.meituan.com/search?q=${k}`, web, "美团");
+  else openApp(`dianping://searchshoplist?keyword=${k}`, web, "大众点评");
+}
+const dealBtns = kw => `<button class="deal mt" data-deal="mt" data-q="${kw}">美团</button><button class="deal dp" data-deal="dp" data-q="${kw}">点评</button>`;
 const SRC = "travelhelper";
 function navTo(key, mode){
   const p = PLACES[key];
@@ -370,14 +392,15 @@ function render(){
         <label class="shop ${got[sh.id]?"got":""}">
           <input type="checkbox" data-shop="${sh.id}" ${got[sh.id]?"checked":""}>
           <span class="box">${ICON_CHECK}</span>
-          <span class="info"><b>${sh.name}</b><span>${sh.note}</span></span>
-          <button data-kw="${sh.kw}">高德搜</button>
+          <span class="info"><b>${sh.name}</b><span>${sh.note}</span>
+            <span class="acts"><button class="deal amap" data-kw="${sh.kw}">高德</button>${dealBtns(sh.kw)}</span></span>
         </label>`).join("")}</div>
         <div class="tally">已打卡 ${n} / ${it.shops.length}</div>`;
     }
     const btns = [];
     if (it.place) btns.push(`<button class="nav" data-nav="${it.place}" data-mode="1">${ICON_NAV}导航到这里</button>`);
     if (it.search) btns.push(`<button class="nav alt" data-kw="${it.search.kw}">${ICON_SEARCH}${it.search.label}</button>`);
+    if (it.deal) btns.push(`<span class="dealrow"><span class="small">团购</span>${dealBtns(it.deal)}</span>`);
     const isLast = i === STOPS[STOPS.length-1];
     return `<div class="item ${it.kind}" data-i="${i}">
       <div class="clock">${s!=null?`<b>${fmt(s)}</b>`:""}${e!=null?`<span>至 ${fmt(e)}</span>`:""}</div>
@@ -456,6 +479,7 @@ document.addEventListener("click", e => {
   e.preventDefault();
   if (b.dataset.nav) navTo(b.dataset.nav, Number(b.dataset.mode));
   else if (b.dataset.kw) searchAmap(b.dataset.kw);
+  else if (b.dataset.deal) openDeal(b.dataset.deal, b.dataset.q);
   else if (b.dataset.cur) setCur(Number(b.dataset.cur), false);
   else if (b.dataset.next) setCur(STOPS[STOPS.indexOf(Number(b.dataset.next)) + 1], true);
 });
