@@ -1,5 +1,5 @@
 // 离线缓存：首次打开后缓存全部文件，之后断网也能用。改了页面记得把版本号 +1
-const CACHE = "trip-v3";
+const CACHE = "trip-v4";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
