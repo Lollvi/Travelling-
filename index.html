@@ -173,10 +173,10 @@ button.nav svg{width:16px;height:16px}
         <div class="lbl">距回程发车</div>
         <div class="count" id="count">--</div>
       </div>
-      <label class="dep"><span class="lbl">回天津车次</span><input type="time" id="dep" value="20:35"></label>
+      <label class="dep"><span class="lbl">回天津车次</span><input type="time" id="dep" value="20:30"></label>
     </div>
     <div class="progress" id="progress"><i></i></div>
-    <div class="ends"><span>09:30 北京南</span><span id="endLbl">20:35 发车</span></div>
+    <div class="ends"><span>09:30 北京南</span><span id="endLbl">20:30 发车</span></div>
     <div class="hwarn" id="warn"></div>
   </header>
 
@@ -350,7 +350,7 @@ function searchAmap(kw){
 }
 
 // ===== 时间计算 =====
-function depMin(){ return toMin($("#dep").value || "20:35"); }
+function depMin(){ return toMin($("#dep").value || "20:30"); }
 function times(it){
   const d = depMin();
   const s = it.start ? toMin(it.start) : it.startFromDep!=null ? d - it.startFromDep : null;
@@ -501,7 +501,7 @@ document.addEventListener("change", e => {
   const card = e.target.closest(".card"), all = [...card.querySelectorAll("[data-shop]")];
   card.querySelector(".tally").textContent = `已打卡 ${all.filter(x=>x.checked).length} / ${all.length}`;
 });
-$("#dep").value = store.get("dep", "20:35");
+$("#dep").value = store.get("dep", "20:30");
 $("#dep").addEventListener("change", () => { store.set("dep", $("#dep").value); render(); });
 render();
 setInterval(tick, 30000);
