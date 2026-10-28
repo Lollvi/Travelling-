@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>北京赏秋一日</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="旅行助手">
+<meta name="theme-color" content="#b8471f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{
+  --bg:#f5efe6; --card:#fffdf9; --ink:#2a211c; --sub:#857367; --faint:#b9aa9d; --line:#eadfd2;
+  --accent:#c4532a; --accent-2:#e08a3c; --accent-soft:#f8e4d6; --gold:#d9a23a;
+  --park:#5d8a4f; --park-soft:#e4eedd; --meal:#b07c16; --meal-soft:#f6ecd2;
+  --leg:#efe6da; --shadow:0 1px 2px rgba(80,50,30,.06),0 6px 20px rgba(80,50,30,.07);
+  --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC",serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#17120f; --card:#231c18; --ink:#f3ebe3; --sub:#ab9b8f; --faint:#6e6158; --line:#362c26;
+    --accent:#ec7a4b; --accent-soft:#3a2519; --park:#8fbf80; --park-soft:#223020; --meal:#e5b555; --meal-soft:#352b17;
+    --leg:#1f1915; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:560px;margin:0 auto;padding:0 16px calc(env(safe-area-inset-bottom) + 48px)}
+
+/* ---------- 头图 ---------- */
+.hero{position:relative;overflow:hidden;color:#fff8f0;
+  margin:0 -16px;padding:calc(env(safe-area-inset-top) + 28px) 22px 26px;
+  background:radial-gradient(120% 90% at 100% 0%,#f0a14a 0%,rgba(240,161,74,0) 60%),
+             linear-gradient(160deg,#c9552a 0%,#a63a1c 55%,#7d2a16 100%);
+  border-radius:0 0 28px 28px}
+.hero svg.leaves{position:absolute;right:-20px;top:calc(env(safe-area-inset-top) - 6px);width:220px;height:220px;opacity:.9;pointer-events:none}
+.hero .kicker{font-size:12px;letter-spacing:3px;opacity:.8}
+.hero h1{font-family:var(--serif);font-weight:700;font-size:34px;line-height:1.2;margin:6px 0 4px;letter-spacing:2px}
+.hero .date{font-size:14px;opacity:.85}
+.hero .stats{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:22px}
+.hero .lbl{font-size:12px;opacity:.75;letter-spacing:1px}
+.hero .count{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15;margin-top:2px}
+.dep{display:flex;flex-direction:column;align-items:flex-end}
+.dep input{font:inherit;font-size:18px;font-weight:600;color:#fff;background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:5px 10px;margin-top:4px;-webkit-appearance:none;min-height:40px}
+.dep input::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.8}
+.progress{position:relative;height:6px;border-radius:9px;background:rgba(255,255,255,.2);margin-top:20px}
+.progress i{position:absolute;inset:0 auto 0 0;border-radius:9px;background:linear-gradient(90deg,#ffd59a,#fff3e0);width:0;transition:width .6s}
+.progress b{position:absolute;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:rgba(255,255,255,.55)}
+.ends{display:flex;justify-content:space-between;font-size:11px;opacity:.7;margin-top:6px;font-variant-numeric:tabular-nums}
+
+/* ---------- 当前状态条（吸顶）---------- */
+.nowbar{position:sticky;top:0;z-index:5;margin:14px -16px 0;padding:calc(env(safe-area-inset-top) * 0 + 10px) 16px;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.nowcard{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:11px 14px;box-shadow:var(--shadow)}
+.pulse{flex:none;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(196,83,42,.5);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(196,83,42,0)}100%{box-shadow:0 0 0 0 rgba(196,83,42,0)}}
+.nowcard .t{font-size:14.5px;line-height:1.45}
+.nowcard .t b{color:var(--accent)}
+.nowcard .t .small{font-size:12.5px;color:var(--sub)}
+.warn{font-size:12.5px;color:var(--sub);margin-top:4px}
+
+/* ---------- 时间轴 ---------- */
+.tl{position:relative;margin-top:14px;--rail:58px}
+.tl::before{content:"";position:absolute;left:var(--rail);top:18px;bottom:30px;width:2px;background:var(--line);border-radius:2px}
+.item{position:relative;display:grid;grid-template-columns:calc(var(--rail) - 12px) 1fr;column-gap:26px;margin-bottom:12px}
+.item .clock{text-align:right;padding-top:16px;font-variant-numeric:tabular-nums}
+.item .clock b{display:block;font-size:16px;font-weight:700;letter-spacing:.3px}
+.item .clock span{font-size:11.5px;color:var(--faint)}
+.dot{position:absolute;left:calc(var(--rail) - 10px);top:15px;width:22px;height:22px;border-radius:50%;
+  background:var(--card);border:2px solid var(--line);display:grid;place-items:center;font-size:11px}
+.item.park .dot{border-color:var(--park)} .item.meal .dot{border-color:var(--meal)} .item.snack .dot,.item.go .dot{border-color:var(--accent)}
+.item.cur .dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 5px var(--accent-soft)}
+.item.done{opacity:.5}
+.item.done .dot{background:var(--line)}
+
+.card{background:var(--card);border-radius:20px;padding:15px 16px 16px;box-shadow:var(--shadow);min-width:0}
+.item.cur .card{box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.card .head{display:flex;align-items:center;gap:10px}
+.card .head > div{flex:1;min-width:0}
+button.setcur{flex:none;align-self:flex-start;font:inherit;font-size:12px;font-weight:600;color:var(--sub);
+  background:transparent;border:1px solid var(--line);border-radius:99px;padding:4px 10px}
+.item.cur button.setcur{display:none}
+button.next{display:none;width:100%;justify-content:center;margin-top:14px;font:inherit;font-size:15px;font-weight:700;
+  border:0;border-radius:14px;padding:12px;color:#fff;background:var(--park);box-shadow:0 3px 10px rgba(93,138,79,.3)}
+.item.cur button.next{display:flex}
+button.next:active,button.setcur:active{transform:scale(.97)}
+.nowcard{cursor:pointer}
+.reset{display:block;margin:14px auto 0;font:inherit;font-size:13px;color:var(--sub);background:none;border:0;text-decoration:underline}
+.icon{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:var(--accent-soft)}
+.park .icon{background:var(--park-soft)} .meal .icon{background:var(--meal-soft)}
+.card h2{font-family:var(--serif);font-size:19px;font-weight:700;line-height:1.3;margin:0}
+.tag{display:inline-block;font-size:11px;font-weight:600;color:var(--accent);margin-top:1px;letter-spacing:1px}
+.park .tag{color:var(--park)} .meal .tag{color:var(--meal)}
+.card p{margin:10px 0 0;font-size:14.5px;color:var(--ink)}
+.card p b{color:var(--accent);font-weight:600}
+.tips{list-style:none;margin:10px 0 0;padding:0;font-size:13.5px;color:var(--sub)}
+.tips li{position:relative;padding-left:16px;margin:3px 0}
+.tips li::before{content:"";position:absolute;left:3px;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+button.nav{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:12px;padding:9px 14px;min-height:40px;
+  background:linear-gradient(180deg,var(--accent-2),var(--accent));color:#fff;display:inline-flex;align-items:center;gap:6px;
+  box-shadow:0 3px 10px rgba(196,83,42,.28)}
+button.nav.alt{background:var(--accent-soft);color:var(--accent);box-shadow:none}
+button.nav:active{transform:scale(.97)}
+button.nav svg{width:16px;height:16px}
+
+/* ---------- 交通段 ---------- */
+.leg{grid-column:2;background:var(--leg);border-radius:16px;padding:12px 14px;font-size:14px}
+.leg .dur{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--sub);margin-bottom:8px;letter-spacing:.5px}
+.step{display:flex;gap:10px;align-items:flex-start;padding:5px 0}
+.badge{flex:none;height:22px;min-width:22px;padding:0 6px;border-radius:11px;font-size:12px;font-weight:800;color:#fff;
+  display:grid;place-items:center;margin-top:1px;letter-spacing:.3px}
+.badge.round{width:22px;padding:0}
+.l2{background:#004b87} .l4{background:#008e9c} .l5{background:#a6217f} .l8{background:#009b6b} .l14{background:#d5a7a1;color:#5a2c25}
+.walk{background:var(--faint)} .exit{background:var(--gold);color:#3a2700}
+.step .txt{min-width:0;line-height:1.5}
+.step .txt b{font-weight:650}
+.leg .opt{font-size:12.5px;color:var(--sub);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.leg .btns{margin-top:10px}
+
+/* ---------- 小吃清单 ---------- */
+.shops{margin-top:12px;display:grid;gap:8px}
+.shop{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:var(--bg);cursor:pointer}
+.shop input{position:absolute;opacity:0;pointer-events:none}
+.box{flex:none;width:24px;height:24px;border-radius:8px;border:2px solid var(--faint);display:grid;place-items:center;transition:.2s}
+.box svg{width:14px;height:14px;stroke:#fff;stroke-width:3;fill:none;opacity:0;transform:scale(.5);transition:.2s}
+.shop.got .box{background:var(--park);border-color:var(--park)}
+.shop.got .box svg{opacity:1;transform:none}
+.shop .info{flex:1;min-width:0;line-height:1.35}
+.shop .info b{font-size:15px;font-weight:600}
+.shop .info span{display:block;font-size:12.5px;color:var(--sub)}
+.shop.got .info b{text-decoration:line-through;text-decoration-color:var(--faint);color:var(--sub)}
+.shop button{flex:none;font:inherit;font-size:13px;font-weight:600;border:0;border-radius:10px;padding:7px 10px;background:var(--accent-soft);color:var(--accent)}
+.tally{font-size:12px;color:var(--sub);margin-top:10px;text-align:right}
+
+.foot{margin:28px 4px 0;padding:16px;border-radius:16px;border:1px dashed var(--line);font-size:12.5px;color:var(--sub);list-style:none}
+.foot li{margin:4px 0;padding-left:14px;position:relative}
+.foot li::before{content:"·";position:absolute;left:2px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translate(-50%,10px);
+  background:rgba(30,22,18,.92);color:#fff;font-size:14px;padding:10px 16px;border-radius:14px;opacity:0;transition:.25s;pointer-events:none;max-width:88vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <svg class="leaves" viewBox="0 0 220 220" aria-hidden="true">
+      <defs>
+        <path id="gk" d="M0 0C-4-14-26-26-30-44C-20-50-8-46 0-40C8-46 20-50 30-44C26-26 4-14 0 0Z"/>
+      </defs>
+      <g fill="#ffd27a"><use href="#gk" transform="translate(150 96) rotate(-24) scale(1.5)"/></g>
+      <g fill="#f6b04e" opacity=".85"><use href="#gk" transform="translate(96 60) rotate(28) scale(1.05)"/></g>
+      <g fill="#ffe3a8" opacity=".55"><use href="#gk" transform="translate(186 176) rotate(160) scale(.9)"/></g>
+      <g fill="#ffc35e" opacity=".7"><use href="#gk" transform="translate(70 150) rotate(-70) scale(.7)"/></g>
+      <g stroke="#ffd27a" stroke-width="2" stroke-linecap="round" fill="none" opacity=".8">
+        <path d="M150 96l10 26"/><path d="M96 60l-6 14"/>
+      </g>
+    </svg>
+    <div class="kicker">AUTUMN · BEIJING</div>
+    <h1>北京赏秋一日</h1>
+    <div class="date">10 月 29 日 · 天津 ⇄ 北京南</div>
+    <div class="stats">
+      <div>
+        <div class="lbl">距回程发车</div>
+        <div class="count" id="count">--</div>
+      </div>
+      <label class="dep"><span class="lbl">回天津车次</span><input type="time" id="dep" value="19:30"></label>
+    </div>
+    <div class="progress" id="progress"><i></i></div>
+    <div class="ends"><span>09:30 北京南</span><span id="endLbl">19:30 发车</span></div>
+  </header>
+
+  <div class="nowbar">
+    <div class="nowcard">
+      <span class="pulse"></span>
+      <div><div class="t" id="now"></div><div class="warn" id="warn"></div></div>
+    </div>
+  </div>
+
+  <div class="tl" id="tl"></div>
+
+  <ul class="foot">
+    <li>地铁出口信息来自车站公开资料，以站内指示牌为准。</li>
+    <li>小吃店地址未逐一核实，点「高德搜」按店名在北京搜索，确认后再导航。</li>
+    <li>建议在高德里提前下载「北京」离线地图。</li>
+    <li>本页已离线缓存，加到主屏幕后断网也能打开。</li>
+  </ul>
+  <button class="reset" id="reset">重置进度和打卡</button>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 行程数据 =====
+// 坐标为 WGS84（高德跳转时用 dev=1 让高德自动纠偏）
+// kind: go 出发/返程 · park 赏秋 · meal 正餐 · snack 小吃/逛街
+const TRIP = {
+  date: "2026-10-29",
+  items: [
+    { type:"stop", start:"09:30", name:"抵达北京南站", tag:"出发", kind:"go", icon:"🚄",
+      desc:"下车后跟着「地铁」指示到地下一层换乘大厅，进 14 号线（在更下面一层 B3）。" },
+
+    { type:"leg", dur:"约 60 分钟 · 换乘 1 次", steps:[
+      {line:"14", text:"往 <b>善各庄</b> 方向，坐 <b>1 站</b> 到 <b>永定门外</b>"},
+      {line:"换", cls:"walk", text:"站内通道换乘 8 号线"},
+      {line:"8", text:"往 <b>朱辛庄</b> 方向，坐 <b>15 站</b> 到 <b>森林公园南门</b>（途经前门、南锣鼓巷、鼓楼大街、奥林匹克公园）"},
+      {line:"出", cls:"exit", text:"<b>A 口（西北）或 B 口（东北）</b>，出来就是奥森南门广场"} ],
+      nav:{ to:"oasen", mode:1 } },
+
+    { type:"stop", start:"10:35", end:"12:15", name:"奥林匹克森林公园", tag:"赏秋 · 南园", kind:"park", icon:"🍁", place:"oasen",
+      desc:"园子很大，建议南门进，走主路到奥海湖边，再往北到仰山，然后原路回南门，约 1.5 小时。",
+      tips:["秋天主要看银杏、元宝枫和湖边芦苇","园内补给点少，带瓶水","12:15 前回到南门地铁站，不然午饭会晚"] },
+
+    { type:"leg", dur:"约 20 分钟 · 直达", steps:[
+      {line:"8", text:"往 <b>瀛海</b> 方向，坐 <b>6 站</b> 到 <b>鼓楼大街</b>"},
+      {line:"出", cls:"exit", text:"<b>F 口（东北，安定门西大街）</b>，往东走就是北锣鼓巷一带"} ],
+      nav:{ to:"beiluogu", mode:1 } },
+
+    { type:"stop", start:"12:35", end:"13:20", name:"午饭", tag:"鼓楼 / 北锣鼓巷周边", kind:"meal", icon:"🍜", place:"beiluogu",
+      desc:"下午还有一整条小吃街，午饭吃七分饱就好。",
+      search:{ kw:"鼓楼 北锣鼓巷 美食", label:"搜附近美食" } },
+
+    { type:"stop", start:"13:20", end:"14:00", name:"北锣鼓巷", tag:"逛胡同", kind:"snack", icon:"🏮", place:"beiluogu",
+      desc:"比南锣鼓巷人少、更有生活气，适合慢慢逛、拍胡同里的秋景。" },
+
+    { type:"leg", dur:"步行约 25 分钟 · 推荐", steps:[
+      {line:"走", cls:"walk", text:"向东到 <b>安定门内大街</b>，拐进 <b>国子监街</b>（两边是老槐树，秋天很好看），走到头就是 <b>雍和宫大街</b>"} ],
+      opt:"不想走路：2 号线安定门 → 雍和宫（1 站），C 口出。",
+      nav:{ to:"tanghulu", mode:2 } },
+
+    { type:"stop", start:"14:25", end:"14:40", name:"雍和宫 · 冰糖葫芦", tag:"小吃", kind:"snack", icon:"🍡", place:"tanghulu",
+      desc:"<b>雍和宫大街 185 号，烤肉宛隔壁</b>。买完沿雍和宫大街一路往南走。" },
+
+    { type:"leg", dur:"步行约 30 分钟 · 边走边吃", steps:[
+      {line:"走", cls:"walk", text:"沿 <b>雍和宫大街 → 北新桥 → 东四北大街</b> 往南，一直走到 <b>东四路口</b>"} ] },
+
+    { type:"food", start:"14:40", end:"16:10", name:"北新桥 → 东四", tag:"小吃街", kind:"snack", icon:"🥮",
+      desc:"从北往南边走边吃，买到一家就勾掉。",
+      shops:[
+        { id:"milk", name:"便民奶站", note:"鲜奶、酸奶", kw:"便民奶站 东四北大街" },
+        { id:"meitan", name:"梅潭村糕点", note:"中式糕点", kw:"梅潭村糕点" },
+        { id:"honghua", name:"红花点心局", note:"点心", kw:"红花点心局 东四" } ] },
+
+    { type:"leg", dur:"约 30 分钟 · 地铁 + 步行", steps:[
+      {line:"5", text:"<b>东四</b> 往 <b>宋家庄</b> 方向，坐 <b>5 站</b> 到 <b>天坛东门</b>（灯市口、东单、崇文门、磁器口）"},
+      {line:"出", cls:"exit", text:"<b>C 口（东南，龙潭路）</b>"},
+      {line:"走", cls:"walk", text:"沿 <b>龙潭路</b> 往东约 800 米到龙潭公园西北门"} ],
+      nav:{ to:"longtan", mode:1 } },
+
+    { type:"stop", start:"16:40", endFromDep:115, name:"龙潭公园", tag:"赏秋 · 看日落", kind:"park", icon:"🌅", place:"longtan",
+      desc:"湖面大、视野开阔。北京这几天<b>约 17:15 日落</b>，可以在湖边等夕阳。",
+      tips:["结束时间按你的车次自动算"] },
+
+    { type:"leg", dur:"约 35 分钟 · 换乘 1 次", steps:[
+      {line:"5", text:"天坛东门往 <b>宋家庄</b> 方向，坐 <b>1 站</b> 到 <b>蒲黄榆</b>"},
+      {line:"换", cls:"walk", text:"站内扶梯换乘 14 号线"},
+      {line:"14", text:"往 <b>张郭庄</b> 方向，经景泰、永定门外，到 <b>北京南站</b>"} ],
+      opt:"累了也可以从公园门口打车，约 20 分钟。",
+      nav:{ to:"nanzhan", mode:1 } },
+
+    { type:"stop", startFromDep:75, endFromDep:30, name:"晚饭", tag:"北京南站", kind:"meal", icon:"🥢", place:"nanzhan",
+      desc:"在车站里或周边吃，不用担心赶不上车。",
+      search:{ kw:"北京南站 美食", label:"搜南站美食" } },
+
+    { type:"stop", startFromDep:30, name:"进站 · 回天津", tag:"返程", kind:"go", icon:"🎫",
+      desc:"发车前 30 分钟到检票口。北京南站进站安检排队可能要十几分钟。" }
+  ]
+};
+
+const PLACES = {
+  oasen:    { name:"奥林匹克森林公园南门", lat:40.0101, lon:116.3906 },
+  beiluogu: { name:"北锣鼓巷", lat:39.9434, lon:116.3966 },
+  tanghulu: { name:"雍和宫大街185号", kw:"雍和宫大街185号" },
+  longtan:  { name:"龙潭公园", lat:39.8791, lon:116.4275 },
+  nanzhan:  { name:"北京南站", lat:39.8650, lon:116.3786 }
+};
+
+// ===== 工具函数 =====
+const $ = s => document.querySelector(s);
+const toMin = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+const fmt = m => String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem(k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove("on"),2200); }
+const ICON_NAV = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>`;
+const ICON_SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
+const ICON_CHECK = `<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+// 唤起高德 App；1.6 秒后页面仍在前台说明没装 App，退回高德网页版
+function openAmap(appUrl, webUrl){
+  let left = false;
+  const onHide = () => { left = true; };
+  document.addEventListener("visibilitychange", onHide, { once:true });
+  window.location.href = appUrl;
+  setTimeout(() => {
+    document.removeEventListener("visibilitychange", onHide);
+    if (!left && document.visibilityState === "visible") {
+      if (navigator.onLine) window.location.href = webUrl;
+      else toast("没有检测到高德地图 App，且当前离线");
+    }
+  }, 1600);
+}
+const SRC = "travelhelper";
+function navTo(key, mode){
+  const p = PLACES[key];
+  if (!p.lat) return searchAmap(p.kw);
+  const n = encodeURIComponent(p.name);
+  const app = `iosamap://path?sourceApplication=${SRC}&dlat=${p.lat}&dlon=${p.lon}&dname=${n}&dev=1&t=${mode}`;
+  const web = `https://uri.amap.com/navigation?to=${p.lon},${p.lat},${n}&mode=${mode===2?"walk":"bus"}&coordinate=wgs84&callnative=1&src=${SRC}`;
+  openAmap(app, web);
+}
+function searchAmap(kw){
+  const k = encodeURIComponent(kw);
+  openAmap(`iosamap://poi?sourceApplication=${SRC}&name=${k}`,
+           `https://uri.amap.com/search?keyword=${k}&city=110000&callnative=1&src=${SRC}`);
+}
+
+// ===== 时间计算 =====
+function depMin(){ return toMin($("#dep").value || "19:30"); }
+function times(it){
+  const d = depMin();
+  const s = it.start ? toMin(it.start) : it.startFromDep!=null ? d - it.startFromDep : null;
+  const e = it.end ? toMin(it.end) : it.endFromDep!=null ? d - it.endFromDep : null;
+  return { s, e };
+}
+
+// ===== 渲染 =====
+function legHTML(it){
+  const steps = it.steps.map(st => {
+    const cls = st.cls || ("l"+st.line);
+    return `<div class="step"><span class="badge ${cls} ${st.line.length===1?"round":""}">${st.line}</span><span class="txt">${st.text}</span></div>`;
+  }).join("");
+  const nav = it.nav ? `<div class="btns"><button class="nav alt" data-nav="${it.nav.to}" data-mode="${it.nav.mode}">${ICON_NAV}高德${it.nav.mode===2?"步行":"公交"}导航</button></div>` : "";
+  return `<div class="item"><div></div><div class="leg">
+    <div class="dur">${it.steps.some(s=>/^\d+$/.test(s.line))?"🚇":"🚶"} ${it.dur}</div>${steps}
+    ${it.opt?`<div class="opt">💡 ${it.opt}</div>`:""}${nav}</div></div>`;
+}
+
+function render(){
+  const got = store.get("shops", {});
+  $("#tl").innerHTML = TRIP.items.map((it, i) => {
+    if (it.type === "leg") return legHTML(it);
+    const { s, e } = times(it);
+    const tips = it.tips ? `<ul class="tips">${it.tips.map(t=>`<li>${t}</li>`).join("")}</ul>` : "";
+    let body = `<p>${it.desc||""}</p>${tips}`;
+    if (it.type === "food") {
+      const n = it.shops.filter(sh => got[sh.id]).length;
+      body += `<div class="shops">${it.shops.map(sh => `
+        <label class="shop ${got[sh.id]?"got":""}">
+          <input type="checkbox" data-shop="${sh.id}" ${got[sh.id]?"checked":""}>
+          <span class="box">${ICON_CHECK}</span>
+          <span class="info"><b>${sh.name}</b><span>${sh.note}</span></span>
+          <button data-kw="${sh.kw}">高德搜</button>
+        </label>`).join("")}</div>
+        <div class="tally" id="tally">已打卡 ${n} / ${it.shops.length}</div>`;
+    }
+    const btns = [];
+    if (it.place) btns.push(`<button class="nav" data-nav="${it.place}" data-mode="1">${ICON_NAV}导航到这里</button>`);
+    if (it.search) btns.push(`<button class="nav alt" data-kw="${it.search.kw}">${ICON_SEARCH}${it.search.label}</button>`);
+    const isLast = i === STOPS[STOPS.length-1];
+    return `<div class="item ${it.kind}" data-i="${i}">
+      <div class="clock">${s!=null?`<b>${fmt(s)}</b>`:""}${e!=null?`<span>至 ${fmt(e)}</span>`:""}</div>
+      <span class="dot"></span>
+      <div class="card">
+        <div class="head"><span class="icon">${it.icon}</span><div><h2>${it.name}</h2><span class="tag">${it.tag}</span></div>
+          <button class="setcur" data-cur="${i}">我在这</button></div>
+        ${body}${btns.length?`<div class="btns">${btns.join("")}</div>`:""}
+        ${isLast ? "" : `<button class="next" data-next="${i}">✓ 这站完成，去下一站</button>`}
+      </div>
+    </div>`;
+  }).join("");
+  $("#endLbl").textContent = fmt(depMin()) + " 发车";
+  showProgress();
+  tick();
+}
+
+// ===== 当前站：手动切换 =====
+const STOPS = TRIP.items.map((it, i) => it.type === "leg" ? -1 : i).filter(i => i >= 0);
+let cur = store.get("cur", STOPS[0]);
+if (!STOPS.includes(cur)) cur = STOPS[0];
+
+function showProgress(){
+  const k = STOPS.indexOf(cur);
+  document.querySelectorAll(".item[data-i]").forEach(el => {
+    const i = Number(el.dataset.i);
+    el.classList.toggle("cur", i === cur);
+    el.classList.toggle("done", i < cur);
+  });
+  const it = TRIP.items[cur], nextIt = TRIP.items[STOPS[k+1]];
+  $("#now").innerHTML = `现在 · <b>${it.name}</b>` + (nextIt ? `<br><span class="small">下一站 · ${nextIt.name}</span>` : "");
+
+  const bar = $("#progress");
+  bar.querySelectorAll("b").forEach(b => b.remove());
+  STOPS.forEach((_, j) => {
+    if (j === 0 || j === STOPS.length-1) return;
+    const b = document.createElement("b");
+    b.style.left = (j/(STOPS.length-1)*100) + "%";
+    bar.appendChild(b);
+  });
+  $("#progress i").style.width = (k/(STOPS.length-1)*100) + "%";
+}
+
+function setCur(i, scrollTo){
+  cur = i;
+  store.set("cur", cur);
+  showProgress();
+  if (!scrollTo) return;
+  // 滚到去这一站的交通卡片（没有就滚到这一站本身），先看怎么走
+  const el = document.querySelector(`.item[data-i="${i}"]`);
+  const target = el.previousElementSibling && !el.previousElementSibling.dataset.i ? el.previousElementSibling : el;
+  window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - 100, behavior:"smooth" });
+}
+
+function tick(){
+  const now = new Date();
+  const d = depMin();
+
+  // 倒计时
+  const [y,mo,da] = TRIP.date.split("-").map(Number);
+  const diff = new Date(y, mo-1, da, Math.floor(d/60), d%60) - now;
+  if (diff > 0) {
+    const h = Math.floor(diff/3.6e6), m = Math.floor(diff%3.6e6/6e4);
+    $("#count").textContent = h >= 24 ? `${Math.floor(h/24)} 天 ${h%24} 小时` : `${h} 小时 ${m} 分`;
+  } else $("#count").textContent = "已发车";
+
+  const leaveLT = d - 115;
+  $("#warn").textContent = `⏰ 最晚 ${fmt(leaveLT)} 离开龙潭公园` +
+    (leaveLT < toMin("17:10") ? "（车次较早，可缩短龙潭或直接在南站吃晚饭）" : "");
+}
+
+// ===== 事件 =====
+document.addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  e.preventDefault();
+  if (b.dataset.nav) navTo(b.dataset.nav, Number(b.dataset.mode));
+  else if (b.dataset.kw) searchAmap(b.dataset.kw);
+  else if (b.dataset.cur) setCur(Number(b.dataset.cur), false);
+  else if (b.dataset.next) setCur(STOPS[STOPS.indexOf(Number(b.dataset.next)) + 1], true);
+});
+$(".nowcard").addEventListener("click", () => {
+  const el = document.querySelector(`.item[data-i="${cur}"]`);
+  window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - 100, behavior:"smooth" });
+});
+$("#reset").addEventListener("click", () => {
+  if (!confirm("清空当前站和小吃打卡记录？")) return;
+  store.set("shops", {});
+  store.set("cur", STOPS[0]);
+  cur = STOPS[0];
+  render();
+});
+document.addEventListener("change", e => {
+  if (!e.target.dataset.shop) return;
+  const got = store.get("shops", {});
+  got[e.target.dataset.shop] = e.target.checked;
+  store.set("shops", got);
+  e.target.closest(".shop").classList.toggle("got", e.target.checked);
+  const all = document.querySelectorAll("[data-shop]");
+  $("#tally").textContent = `已打卡 ${[...all].filter(x=>x.checked).length} / ${all.length}`;
+});
+$("#dep").value = store.get("dep", "19:30");
+$("#dep").addEventListener("change", () => { store.set("dep", $("#dep").value); render(); });
+render();
+setInterval(tick, 30000);
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
