@@ -52,15 +52,18 @@ main{max-width:560px;margin:0 auto;padding:0 16px calc(env(safe-area-inset-botto
 .ends{display:flex;justify-content:space-between;font-size:11px;opacity:.7;margin-top:6px;font-variant-numeric:tabular-nums}
 
 /* ---------- 当前状态条（吸顶）---------- */
-.nowbar{position:sticky;top:0;z-index:5;margin:14px -16px 0;padding:calc(env(safe-area-inset-top) * 0 + 10px) 16px;
-  background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.nowcard{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:11px 14px;box-shadow:var(--shadow)}
-.pulse{flex:none;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(196,83,42,.5);animation:pulse 2s infinite}
-@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(196,83,42,0)}100%{box-shadow:0 0 0 0 rgba(196,83,42,0)}}
-.nowcard .t{font-size:14.5px;line-height:1.45}
+/* 吸顶时停在状态栏（刘海/灵动岛）下方，上面那条安全区用底色盖住，避免内容从状态栏底下透出来 */
+.nowbar{position:sticky;top:env(safe-area-inset-top);z-index:5;margin:14px -16px 0;padding:8px 16px;background:var(--bg)}
+.nowbar::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:env(safe-area-inset-top);background:var(--bg);display:none}
+.nowbar.stuck::before{display:block}
+.nowbar.stuck{box-shadow:0 6px 12px -8px rgba(80,50,30,.25)}
+.nowcard{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow)}
+.pulse{flex:none;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(196,83,42,.5);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(196,83,42,0)}100%{box-shadow:0 0 0 0 rgba(196,83,42,0)}}
+.nowcard .t{flex:1;min-width:0;font-size:14.5px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nowcard .t b{color:var(--accent)}
 .nowcard .t .small{font-size:12.5px;color:var(--sub)}
-.warn{font-size:12.5px;color:var(--sub);margin-top:4px}
+.hwarn{margin-top:12px;font-size:12.5px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.14)}
 
 /* ---------- 时间轴 ---------- */
 /* 时间列 46px | 留白 | 圆点（中心在 --rail）| 留白 | 卡片 */
@@ -136,17 +139,7 @@ button.nav svg{width:16px;height:16px}
 .shop .info b{font-size:15px;font-weight:600}
 .shop .info span{display:block;font-size:12.5px;color:var(--sub)}
 .shop.got .info b{text-decoration:line-through;text-decoration-color:var(--faint);color:var(--sub)}
-.shop{align-items:flex-start}
-.shop .box{margin-top:1px}
-.acts{display:flex !important;gap:6px;margin-top:8px}
-button.deal{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:9px;padding:5px 11px;min-height:30px}
-button.deal:active{transform:scale(.95)}
-button.deal.amap{background:var(--accent-soft);color:var(--accent)}
-button.deal.mt{background:#ffd100;color:#3b2e00}
-button.deal.dp{background:#ff6633;color:#fff}
-.dealrow{display:inline-flex;align-items:center;gap:6px}
-.dealrow .small{font-size:12.5px;color:var(--sub);margin-right:2px}
-.dealrow button.deal{min-height:40px;padding:0 14px;font-size:14px;border-radius:12px}
+.shop button{flex:none;font:inherit;font-size:13px;font-weight:600;border:0;border-radius:10px;padding:7px 10px;background:var(--accent-soft);color:var(--accent)}
 .tally{font-size:12px;color:var(--sub);margin-top:10px;text-align:right}
 
 .foot{margin:28px 4px 0;padding:16px;border-radius:16px;border:1px dashed var(--line);font-size:12.5px;color:var(--sub);list-style:none}
@@ -184,12 +177,13 @@ button.deal.dp{background:#ff6633;color:#fff}
     </div>
     <div class="progress" id="progress"><i></i></div>
     <div class="ends"><span>09:30 北京南</span><span id="endLbl">20:35 发车</span></div>
+    <div class="hwarn" id="warn"></div>
   </header>
 
   <div class="nowbar">
     <div class="nowcard">
       <span class="pulse"></span>
-      <div><div class="t" id="now"></div><div class="warn" id="warn"></div></div>
+      <div class="t" id="now"></div>
     </div>
   </div>
 
@@ -224,33 +218,40 @@ const TRIP = {
 
     { type:"stop", start:"10:35", end:"12:15", name:"奥林匹克森林公园", tag:"赏秋 · 南园", kind:"park", icon:"🍁", place:"oasen",
       desc:"园子很大，建议南门进，走主路到奥海湖边，再往北到仰山，然后原路回南门，约 1.5 小时。",
-      tips:["秋天主要看银杏、元宝枫和湖边芦苇","园内补给点少，带瓶水","12:15 前回到南门地铁站，不然午饭会晚"] },
+      tips:["秋天主要看银杏、元宝枫和湖边芦苇","园内补给点少，带瓶水","12:15 前回到南门地铁站，后面安排比较紧"] },
 
     { type:"leg", dur:"约 20 分钟 · 直达", steps:[
-      {line:"8", text:"往 <b>瀛海</b> 方向，坐 <b>6 站</b> 到 <b>鼓楼大街</b>"},
-      {line:"出", cls:"exit", text:"<b>F 口（东北，安定门西大街）</b>，往东走就是北锣鼓巷一带"} ],
-      nav:{ to:"beiluogu", mode:1 } },
+      {line:"8", text:"往 <b>瀛海</b> 方向，坐 <b>7 站</b> 到 <b>什刹海</b>（鼓楼大街的下一站）"},
+      {line:"出", cls:"exit", text:"<b>C 口（东南）</b>，往东就是帽儿胡同、南锣鼓巷一带"} ],
+      nav:{ to:"qingyu", mode:1 } },
 
-    { type:"stop", start:"12:35", end:"13:20", name:"午饭", tag:"鼓楼 / 北锣鼓巷周边", kind:"meal", icon:"🍜", place:"beiluogu",
-      desc:"下午还有一整条小吃街，午饭吃七分饱就好。",
-      search:{ kw:"鼓楼 北锣鼓巷 美食", label:"搜附近美食" } },
+    { type:"stop", start:"12:35", end:"13:20", name:"午饭", tag:"什刹海 / 南锣鼓巷周边", kind:"meal", icon:"🍜",
+      desc:"下午还有酸奶和一整条小吃街，午饭吃七分饱就好。南锣鼓巷主街偏贵、游客多，可以往旁边胡同里找。",
+      search:{ kw:"南锣鼓巷 美食", label:"搜附近美食" } },
 
-    { type:"stop", start:"13:20", end:"14:00", name:"北锣鼓巷", tag:"逛胡同", kind:"snack", icon:"🏮", place:"beiluogu",
-      desc:"比南锣鼓巷人少、更有生活气，适合慢慢逛、拍胡同里的秋景。" },
+    { type:"stop", start:"13:20", end:"13:40", name:"青玉酸奶", tag:"饭后甜点", kind:"snack", icon:"🥛", place:"qingyu",
+      desc:"<b>豆角胡同 46 号</b>，在南锣鼓巷西边的胡同里，不在主街上。胡同老店，招牌是青海酸奶，人均 20 元左右。",
+      tips:["从什刹海站 C 口步行约 5 分钟","营业时间各平台说法不一，到了以现场为准"] },
+
+    { type:"leg", dur:"步行约 15 分钟", steps:[
+      {line:"走", cls:"walk", text:"出豆角胡同进 <b>帽儿胡同</b> 往东，走到 <b>南锣鼓巷</b>"},
+      {line:"走", cls:"walk", text:"沿南锣鼓巷 <b>往北</b> 走到头，过 <b>鼓楼东大街</b>，对面就是北锣鼓巷"} ] },
+
+    { type:"stop", start:"13:40", end:"14:30", name:"南锣鼓巷 → 北锣鼓巷", tag:"逛胡同 · 一路往北", kind:"snack", icon:"🏮", place:"beiluogu",
+      desc:"南锣鼓巷热闹，北锣鼓巷人少、更有生活气。一条线往北逛过去，适合拍胡同里的秋景。" },
 
     { type:"leg", dur:"步行约 25 分钟 · 推荐", steps:[
       {line:"走", cls:"walk", text:"向东到 <b>安定门内大街</b>，拐进 <b>国子监街</b>（两边是老槐树，秋天很好看），走到头就是 <b>雍和宫大街</b>"} ],
       opt:"不想走路：2 号线安定门 → 雍和宫（1 站），C 口出。",
       nav:{ to:"tanghulu", mode:2 } },
 
-    { type:"stop", start:"14:25", end:"14:40", name:"雍和宫 · 冰糖葫芦", tag:"小吃", kind:"snack", icon:"🍡", place:"tanghulu",
-      desc:"<b>雍和宫大街 185 号，烤肉宛隔壁</b>。买完沿雍和宫大街一路往南走。",
-      deal:"冰糖葫芦 雍和宫大街" },
+    { type:"stop", start:"14:55", end:"15:05", name:"雍和宫 · 冰糖葫芦", tag:"小吃", kind:"snack", icon:"🍡", place:"tanghulu",
+      desc:"<b>雍和宫大街 185 号，烤肉宛隔壁</b>。买完沿雍和宫大街一路往南走。" },
 
     { type:"leg", dur:"步行约 30 分钟 · 边走边吃", steps:[
       {line:"走", cls:"walk", text:"沿 <b>雍和宫大街 → 北新桥 → 东四北大街</b> 往南，一直走到 <b>东四路口</b>"} ] },
 
-    { type:"food", start:"14:40", end:"16:10", name:"北新桥 → 东四", tag:"小吃街", kind:"snack", icon:"🥮",
+    { type:"food", start:"15:05", end:"16:15", name:"北新桥 → 东四", tag:"小吃街", kind:"snack", icon:"🥮",
       desc:"从北往南边走边吃，买到一家就勾掉。",
       shops:[
         { id:"milk", name:"便民奶站", note:"鲜奶、酸奶", kw:"便民奶站 东四北大街" },
@@ -263,7 +264,7 @@ const TRIP = {
       {line:"走", cls:"walk", text:"沿 <b>龙潭路</b> 往东约 800 米到龙潭公园西北门"} ],
       nav:{ to:"longtan", mode:1 } },
 
-    { type:"stop", start:"16:40", end:"17:40", name:"龙潭公园", tag:"赏秋 · 看日落", kind:"park", icon:"🌅", place:"longtan",
+    { type:"stop", start:"16:45", end:"17:40", name:"龙潭公园", tag:"赏秋 · 看日落", kind:"park", icon:"🌅", place:"longtan",
       desc:"湖面大、视野开阔。北京这几天<b>约 17:15 日落</b>，可以在湖边等夕阳，天黑前出园。" },
 
     { type:"leg", dur:"约 35 分钟 · 换乘 1 次", steps:[
@@ -299,6 +300,7 @@ const TRIP = {
 const PLACES = {
   oasen:    { name:"奥林匹克森林公园南门", lat:40.0101, lon:116.3906 },
   beiluogu: { name:"北锣鼓巷", lat:39.9434, lon:116.3966 },
+  qingyu:   { name:"青玉酸奶", kw:"青玉酸奶 豆角胡同" },
   tanghulu: { name:"雍和宫大街185号", kw:"雍和宫大街185号" },
   longtan:  { name:"龙潭公园", lat:39.8791, lon:116.4275 },
   xianyukou:{ name:"鲜鱼口美食街", kw:"鲜鱼口美食街" },
@@ -318,8 +320,8 @@ const ICON_NAV = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4.
 const ICON_SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
 const ICON_CHECK = `<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-// 唤起 App；1.6 秒后页面仍在前台说明没装 App，退回网页版
-function openApp(appUrl, webUrl, appName){
+// 唤起高德 App；1.6 秒后页面仍在前台说明没装 App，退回高德网页版
+function openAmap(appUrl, webUrl){
   let left = false;
   const onHide = () => { left = true; };
   document.addEventListener("visibilitychange", onHide, { once:true });
@@ -328,21 +330,10 @@ function openApp(appUrl, webUrl, appName){
     document.removeEventListener("visibilitychange", onHide);
     if (!left && document.visibilityState === "visible") {
       if (navigator.onLine) window.location.href = webUrl;
-      else toast(`没有检测到${appName} App，且当前离线`);
+      else toast("没有检测到高德地图 App，且当前离线");
     }
   }, 1600);
 }
-const openAmap = (app, web) => openApp(app, web, "高德地图");
-
-// 团购：在美团 / 大众点评里按店名搜索，店铺页里看有没有团购套餐
-// 两个 App 都没装时退回大众点评网页版（城市 2 = 北京）
-function openDeal(app, kw){
-  const k = encodeURIComponent(kw);
-  const web = `https://m.dianping.com/search/keyword/2/0_${k}`;
-  if (app === "mt") openApp(`imeituan://www.meituan.com/search?q=${k}`, web, "美团");
-  else openApp(`dianping://searchshoplist?keyword=${k}`, web, "大众点评");
-}
-const dealBtns = kw => `<button class="deal mt" data-deal="mt" data-q="${kw}">美团</button><button class="deal dp" data-deal="dp" data-q="${kw}">点评</button>`;
 const SRC = "travelhelper";
 function navTo(key, mode){
   const p = PLACES[key];
@@ -392,15 +383,14 @@ function render(){
         <label class="shop ${got[sh.id]?"got":""}">
           <input type="checkbox" data-shop="${sh.id}" ${got[sh.id]?"checked":""}>
           <span class="box">${ICON_CHECK}</span>
-          <span class="info"><b>${sh.name}</b><span>${sh.note}</span>
-            <span class="acts"><button class="deal amap" data-kw="${sh.kw}">高德</button>${dealBtns(sh.kw)}</span></span>
+          <span class="info"><b>${sh.name}</b><span>${sh.note}</span></span>
+          <button data-kw="${sh.kw}">高德搜</button>
         </label>`).join("")}</div>
         <div class="tally">已打卡 ${n} / ${it.shops.length}</div>`;
     }
     const btns = [];
     if (it.place) btns.push(`<button class="nav" data-nav="${it.place}" data-mode="1">${ICON_NAV}导航到这里</button>`);
     if (it.search) btns.push(`<button class="nav alt" data-kw="${it.search.kw}">${ICON_SEARCH}${it.search.label}</button>`);
-    if (it.deal) btns.push(`<span class="dealrow"><span class="small">团购</span>${dealBtns(it.deal)}</span>`);
     const isLast = i === STOPS[STOPS.length-1];
     return `<div class="item ${it.kind}" data-i="${i}">
       <div class="clock">${s!=null?`<b>${fmt(s)}</b>`:""}${e!=null?`<span>至 ${fmt(e)}</span>`:""}</div>
@@ -431,7 +421,7 @@ function showProgress(){
     el.classList.toggle("done", i < cur);
   });
   const it = TRIP.items[cur], nextIt = TRIP.items[STOPS[k+1]];
-  $("#now").innerHTML = `现在 · <b>${it.name}</b>` + (nextIt ? `<br><span class="small">下一站 · ${nextIt.name}</span>` : "");
+  $("#now").innerHTML = `<b>${it.name}</b>` + (nextIt ? ` <span class="small">→ ${nextIt.name}</span>` : "");
 
   const bar = $("#progress");
   bar.querySelectorAll("b").forEach(b => b.remove());
@@ -452,8 +442,18 @@ function setCur(i, scrollTo){
   // 滚到去这一站的交通卡片（没有就滚到这一站本身），先看怎么走
   const el = document.querySelector(`.item[data-i="${i}"]`);
   const target = el.previousElementSibling && !el.previousElementSibling.dataset.i ? el.previousElementSibling : el;
-  window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - 100, behavior:"smooth" });
+  scrollToEl(target);
 }
+
+// 滚动时让目标停在吸顶条下方，不被挡住
+const nowbar = $(".nowbar");
+const barTop = () => parseFloat(getComputedStyle(nowbar).top) || 0;
+function scrollToEl(el){
+  const offset = barTop() + nowbar.offsetHeight + 12;
+  window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - offset, behavior:"smooth" });
+}
+function updateStuck(){ nowbar.classList.toggle("stuck", nowbar.getBoundingClientRect().top <= barTop() + 0.5); }
+addEventListener("scroll", updateStuck, { passive:true });
 
 function tick(){
   const now = new Date();
@@ -479,13 +479,11 @@ document.addEventListener("click", e => {
   e.preventDefault();
   if (b.dataset.nav) navTo(b.dataset.nav, Number(b.dataset.mode));
   else if (b.dataset.kw) searchAmap(b.dataset.kw);
-  else if (b.dataset.deal) openDeal(b.dataset.deal, b.dataset.q);
   else if (b.dataset.cur) setCur(Number(b.dataset.cur), false);
   else if (b.dataset.next) setCur(STOPS[STOPS.indexOf(Number(b.dataset.next)) + 1], true);
 });
 $(".nowcard").addEventListener("click", () => {
-  const el = document.querySelector(`.item[data-i="${cur}"]`);
-  window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - 100, behavior:"smooth" });
+  scrollToEl(document.querySelector(`.item[data-i="${cur}"]`));
 });
 $("#reset").addEventListener("click", () => {
   if (!confirm("清空当前站和小吃打卡记录？")) return;
